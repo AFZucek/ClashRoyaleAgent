@@ -19,6 +19,9 @@ def extract(image):
 
     # Cards in hand w/their information
 
+
+    
+
 def get_time(image):
     """get Image from top right, uses OCR for the time in seconds"""
 
