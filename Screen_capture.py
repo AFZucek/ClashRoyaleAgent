@@ -39,7 +39,7 @@ def main():
 
     bbox = find_bluestacks_window()
 
-    test_file_path = os.path.join('ClashRoyaleAgent', 'data', 'TestCaptures', 'testscreen.png')
+    test_file_path = os.path.join('data', 'TestCaptures', 'testscreen.png')
 
     if not bbox:
         raise Exception("BlueStacks window not found.")
