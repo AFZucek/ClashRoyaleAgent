@@ -1,8 +1,12 @@
+# screen capture the image
+
+#### IMPORTS ####
 from PIL import ImageGrab
 from Quartz import CGWindowListCopyWindowInfo, kCGWindowListOptionOnScreenOnly, kCGNullWindowID
 import os
 import subprocess
 
+"""TODO: make sure the png returned is a fixed size, somwehre around 480 800"""
 
 def focus_bluestacks():
     """
