@@ -14,7 +14,11 @@ def extract():
     dir = os.path.join(os.path.dirname(__file__) , "data/TestCaptures")
     image_path = os.path.join(dir, "testscreen.png")
     image = Image.open(image_path)
+
     print(image.size)
+    #image = updateImageSize(image)
+    print(image.size)
+
     # time left in seconds
     #time_remaining = get_time(image) # or set a timer
     
@@ -28,16 +32,29 @@ def extract():
 
     # Cards in hand w/their information
 
+def updateImageSize(img):
+    width, height = img.size
+    if width != 400 or height != 686:
+        img = img.resize((400, 686), Image.LANCZOS)
+    img = img.crop((0, 30, img.width - 30, img.height))
+    path = os.path.join('data', 'TestCaptures', 'testscreen.png')
+    img.save(path)
+    return img   
+    
+
 
 def ocr_int_from_subimage(sub_img):
+    # gray scale
     gray = sub_img.convert("L")
 
-    new_size = (gray.width * 5, gray.height * 5)
-    big = gray.resize(new_size, Image.NEAREST)
-    
-    bw = big.point(lambda x: 255 if x > 150 else 0, mode="1")
+    # resize
+    #new_size = (gray.width * 4, gray.height * 4)
+    #big = gray.resize(new_size, Image.NEAREST)
 
-    bw.show()
+    # normalize based on threshold 150
+    bw = gray.point(lambda x: 255 if x > 180 else 0, mode="1")
+
+    # invert
     inv = ImageOps.invert(bw)
     inv.show()
 
@@ -45,7 +62,7 @@ def ocr_int_from_subimage(sub_img):
     config = "--psm 7 -c tessedit_char_whitelist=0123456789"
     raw = pytesseract.image_to_string(inv, config=config).strip()
 
-    # 6) Return integer or None
+    # Return integer or None
     try:
         return int(raw)
     except ValueError:
@@ -67,8 +84,8 @@ def get_tower(image):
     crops image to three specific spots, and runs OCR
     """
     # left
-    left, top = 90, 105
-    width, height = 35, 20
+    left, top = 72, 88
+    width, height = 30, 12
 
     crop_box = (left, top, left + width, top + height)
     left_sub = image.crop(crop_box)
@@ -77,8 +94,8 @@ def get_tower(image):
     left_sub.save("data/TestCaptures/leftTower.png")
 
     # right
-    left, top = 330, 105
-    width, height = 35, 20
+    left, top = 265, 88
+    width, height = 30, 12
 
     crop_box = (left, top, left + width, top + height)
     right_sub = image.crop(crop_box)
