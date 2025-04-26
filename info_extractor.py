@@ -16,7 +16,7 @@ def extract():
     image = Image.open(image_path)
 
     print(image.size)
-    #image = updateImageSize(image)
+    image = updateImageSize(image)
     print(image.size)
 
     # time left in seconds
