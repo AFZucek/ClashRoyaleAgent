@@ -1,52 +1,40 @@
 from PIL import ImageGrab
-from Quartz import CGWindowListCopyWindowInfo, kCGWindowListOptionOnScreenOnly, kCGNullWindowID
+# py -3.11 -m pip install pygetwindow
+import pygetwindow as gw
+import pyautogui
+import time
 import os
-import subprocess
 
 
-def focus_bluestacks():
-    """
-    Bring blue stacks emulator to the front
-    """
-    subprocess.run([
-        "osascript", "-e", 'tell application "BlueStacks" to activate'
-    ])
+def capture_bluestacks():
+    """take screen shot of blue stacks window"""
 
-def find_bluestacks_window():
-    """
-    Find bounding box for bluestacks_window
-    """
-    window_list = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID)
-    for window in window_list:
-        owner_name = window.get('kCGWindowOwnerName', '')
-        window_name = window.get('kCGWindowName', '')
-        if 'BlueStacks' in owner_name or 'BlueStacks' in window_name:
-            bounds = window['kCGWindowBounds']
-            x = int(bounds['X'])
-            y = int(bounds['Y'])
-            w = int(bounds['Width'])
-            h = int(bounds['Height'])
-            return (x, y, x + w, y + h)
-    return None
+    window = gw.getWindowsWithTitle("BlueStacks")
+
+    if not window:
+        raise Exception("BlueStacks window not found")
+    win = window[0]
+
+    # pop it to the front
+    win.activate()
+    time.sleep(0.03)  # give it a moment to come to front
+
+    x, y, w, h = win.left, win.top, win.width, win.height
+
+    img = pyautogui.screenshot(region=(x, y, w, h))
+
+    # save image
+    path = os.path.join("data", "TestCaptures", "testscreen.png")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    img.save(path)
+    return img
 
 
 def main():
-    """
-    Main function, currently testing capture for one image
-    """
+    """main function"""
+    im = capture_bluestacks()
+    print("Captured size:", im.size)
 
-    focus_bluestacks()
-
-    bbox = find_bluestacks_window()
-
-    test_file_path = os.path.join('data', 'TestCaptures', 'testscreen.png')
-
-    if not bbox:
-        raise Exception("BlueStacks window not found.")
-
-    # Capture and savecle
-    img = ImageGrab.grab(bbox)
-    img.save(test_file_path)
 
 if __name__ == "__main__":
     main()

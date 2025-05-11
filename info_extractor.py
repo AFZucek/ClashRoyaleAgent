@@ -34,11 +34,11 @@ def extract():
 
 def updateImageSize(img):
     width, height = img.size
-    if width != 400 or height != 686:
-        img = img.resize((400, 686), Image.LANCZOS)
-    img = img.crop((0, 30, img.width - 30, img.height))
-    path = os.path.join('data', 'TestCaptures', 'testscreen.png')
-    img.save(path)
+    if width != 614 or height != 1094:
+        img = img.resize((614, 1094), Image.LANCZOS)
+        #img = img.crop((0, 30, img.width - 30, img.height))
+        path = os.path.join('data', 'TestCaptures', 'testscreen.png')
+        img.save(path)
     return img   
     
 
