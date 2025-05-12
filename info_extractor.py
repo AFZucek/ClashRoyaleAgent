@@ -16,8 +16,8 @@ def extract():
     image = Image.open(image_path)
 
     print(image.size)
-    image = updateImageSize(image)
-    print(image.size)
+    #image = updateImageSize(image)
+    #print(image.size)
 
     # time left in seconds
     #time_remaining = get_time(image) # or set a timer
@@ -34,8 +34,8 @@ def extract():
 
 def updateImageSize(img):
     width, height = img.size
-    if width != 614 or height != 1094:
-        img = img.resize((614, 1094), Image.LANCZOS)
+    if width != 1185 or height != 2109:
+        img = img.resize((1185, 2109), Image.LANCZOS)
         #img = img.crop((0, 30, img.width - 30, img.height))
         path = os.path.join('data', 'TestCaptures', 'testscreen.png')
         img.save(path)
@@ -49,16 +49,20 @@ def ocr_int_from_subimage(sub_img):
 
     # resize
     #new_size = (gray.width * 4, gray.height * 4)
-    #big = gray.resize(new_size, Image.NEAREST)
+    #big = gray.resize(new_size, Image.LANCZOS)
 
     # normalize based on threshold 150
-    bw = gray.point(lambda x: 255 if x > 180 else 0, mode="1")
+    bw = gray.point(lambda x: 0 if x < 180 else 255, mode="1")
 
     # invert
-    inv = ImageOps.invert(bw)
+    inv = ImageOps.invert(bw.convert("L")).convert("1")
     inv.show()
+    print(inv.size)
 
     # OCR with single-line PSM and digit whitelist
+    # comment this out if its not on windows
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Users\mfouc\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
+
     config = "--psm 7 -c tessedit_char_whitelist=0123456789"
     raw = pytesseract.image_to_string(inv, config=config).strip()
 
@@ -83,22 +87,25 @@ def get_tower(image):
     """
     crops image to three specific spots, and runs OCR
     """
-    # left
-    left, top = 72, 88
-    width, height = 30, 12
+    # left tower
+    w, h = image.size
+    left   = int(w * 0.1983)
+    top    = int(h * 0.1328)
+    width  = int(w * 0.0717)
+    height = int(h * 0.01896)
 
-    crop_box = (left, top, left + width, top + height)
-    left_sub = image.crop(crop_box)
+    left_sub = image.crop((left, top, left + width, top + height))
 
     # you can now save or work with sub_img
     left_sub.save("data/TestCaptures/leftTower.png")
 
     # right
-    left, top = 265, 88
-    width, height = 30, 12
-
-    crop_box = (left, top, left + width, top + height)
-    right_sub = image.crop(crop_box)
+    w, h = image.size
+    left   = int(w * 0.7253)
+    top    = int(h * 0.1328)
+    width  = int(w * 0.0717)
+    height = int(h * 0.01896)
+    right_sub = image.crop((left, top, left + width, top + height))
 
     # you can now save or work with sub_img
     right_sub.save("data/TestCaptures/rightTower.png")
