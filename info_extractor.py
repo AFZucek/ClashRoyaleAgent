@@ -4,7 +4,8 @@
 import os
 from PIL import Image, ImageOps
 import pytesseract
-
+import cv2
+import numpy as np
 
 def extract():
     """Puts together information extracted by OCR in the game"""
@@ -29,7 +30,7 @@ def extract():
     # Cards on screen, oponent/user
 
     # User tower information
-
+    get_elixir()
     # Cards in hand w/their information
 
 def updateImageSize(img):
@@ -57,7 +58,6 @@ def ocr_int_from_subimage(sub_img):
     # invert
     inv = ImageOps.invert(bw.convert("L")).convert("1")
     inv.show()
-    print(inv.size)
 
     # OCR with single-line PSM and digit whitelist
     # comment this out if its not on windows
@@ -72,16 +72,37 @@ def ocr_int_from_subimage(sub_img):
     except ValueError:
         return None
 
-def get_time(image):
-    """get Image from top right, uses OCR for the time in seconds"""
+def get_elixir():
+    """get a cropped image of the elixir with open CV template matching"""
 
-    # Extract Top Right
+    # Load images
+    full_img = Image.open("data/TestCaptures/testscreen.png").convert("L")
+    template = Image.open("data/template.png").convert("L")
 
-    # Run OCR
-    time_string = pytesseract.image_to_string(image)
-    minutes, seconds = map(int, time_string.split(":"))
+    full_array = np.array(full_img)
+    tempate_array = np.array(template)
 
-    return minutes * 60 + seconds
+    # Match template
+    result = cv2.matchTemplate(full_array, tempate_array, cv2.TM_CCOEFF_NORMED)
+    _, max_val, _, max_loc = cv2.minMaxLoc(result)
+
+    print(f"Match confidence: {max_val:.3f} at {max_loc}")
+
+    x, y = max_loc
+
+    # Offset to where number is expected
+    offset_x = 90
+    offset_y = 0
+    box_width = 80
+    box_height = 75
+
+    # Crop number region
+    number_box = (x + offset_x, y + offset_y, x + offset_x + box_width, y + offset_y + box_height)
+    sub_img = Image.open("data/TestCaptures/testscreen.png").crop(number_box)
+    sub_img.show()
+    # run OCR
+    print(ocr_int_from_subimage(sub_img))
+
 
 def get_tower(image):
     """
