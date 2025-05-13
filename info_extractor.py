@@ -4,7 +4,8 @@
 import os
 from PIL import Image, ImageOps
 import pytesseract
-
+import cv2
+import numpy as np
 
 def extract():
     """Puts together information extracted by OCR in the game"""
@@ -14,7 +15,11 @@ def extract():
     dir = os.path.join(os.path.dirname(__file__) , "data/TestCaptures")
     image_path = os.path.join(dir, "testscreen.png")
     image = Image.open(image_path)
+
     print(image.size)
+    #image = updateImageSize(image)
+    #print(image.size)
+
     # time left in seconds
     #time_remaining = get_time(image) # or set a timer
     
@@ -25,63 +30,103 @@ def extract():
     # Cards on screen, oponent/user
 
     # User tower information
-
+    get_elixir()
     # Cards in hand w/their information
+
+def updateImageSize(img):
+    width, height = img.size
+    if width != 1185 or height != 2109:
+        img = img.resize((1185, 2109), Image.LANCZOS)
+        #img = img.crop((0, 30, img.width - 30, img.height))
+        path = os.path.join('data', 'TestCaptures', 'testscreen.png')
+        img.save(path)
+    return img   
+    
 
 
 def ocr_int_from_subimage(sub_img):
+    # gray scale
     gray = sub_img.convert("L")
 
-    new_size = (gray.width * 5, gray.height * 5)
-    big = gray.resize(new_size, Image.NEAREST)
-    
-    bw = big.point(lambda x: 255 if x > 150 else 0, mode="1")
+    # resize
+    #new_size = (gray.width * 4, gray.height * 4)
+    #big = gray.resize(new_size, Image.LANCZOS)
 
-    bw.show()
-    inv = ImageOps.invert(bw)
+    # normalize based on threshold 150
+    bw = gray.point(lambda x: 0 if x < 180 else 255, mode="1")
+
+    # invert
+    inv = ImageOps.invert(bw.convert("L")).convert("1")
     inv.show()
 
     # OCR with single-line PSM and digit whitelist
+    # comment this out if its not on windows
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Users\mfouc\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
+
     config = "--psm 7 -c tessedit_char_whitelist=0123456789"
     raw = pytesseract.image_to_string(inv, config=config).strip()
 
-    # 6) Return integer or None
+    # Return integer or None
     try:
         return int(raw)
     except ValueError:
         return None
 
-def get_time(image):
-    """get Image from top right, uses OCR for the time in seconds"""
+def get_elixir():
+    """get a cropped image of the elixir with open CV template matching"""
 
-    # Extract Top Right
+    # Load images
+    full_img = Image.open("data/TestCaptures/testscreen.png").convert("L")
+    template = Image.open("data/template.png").convert("L")
 
-    # Run OCR
-    time_string = pytesseract.image_to_string(image)
-    minutes, seconds = map(int, time_string.split(":"))
+    full_array = np.array(full_img)
+    tempate_array = np.array(template)
 
-    return minutes * 60 + seconds
+    # Match template
+    result = cv2.matchTemplate(full_array, tempate_array, cv2.TM_CCOEFF_NORMED)
+    _, max_val, _, max_loc = cv2.minMaxLoc(result)
+
+    print(f"Match confidence: {max_val:.3f} at {max_loc}")
+
+    x, y = max_loc
+
+    # Offset to where number is expected
+    offset_x = 90
+    offset_y = 0
+    box_width = 80
+    box_height = 75
+
+    # Crop number region
+    number_box = (x + offset_x, y + offset_y, x + offset_x + box_width, y + offset_y + box_height)
+    sub_img = Image.open("data/TestCaptures/testscreen.png").crop(number_box)
+    sub_img.show()
+    # run OCR
+    print(ocr_int_from_subimage(sub_img))
+
 
 def get_tower(image):
     """
     crops image to three specific spots, and runs OCR
     """
-    # left
-    left, top = 90, 105
-    width, height = 35, 20
+    # left tower
+    w, h = image.size
+    left   = int(w * 0.1983)
+    top    = int(h * 0.1328)
+    width  = int(w * 0.0717)
+    height = int(h * 0.01896)
 
-    crop_box = (left, top, left + width, top + height)
-    left_sub = image.crop(crop_box)
+    left_sub = image.crop((left, top, left + width, top + height))
 
     # you can now save or work with sub_img
     left_sub.save("data/TestCaptures/leftTower.png")
 
     # right
-    left, top = 330, 105
-    width, height = 35, 20
-
-    crop_box = (left, top, left + width, top + height)
-    right_sub = image.crop(crop_box)
+    w, h = image.size
+    left   = int(w * 0.7253)
+    top    = int(h * 0.1328)
+    width  = int(w * 0.0717)
+    height = int(h * 0.01896)
+    right_sub = image.crop((left, top, left + width, top + height))
 
     # you can now save or work with sub_img
     right_sub.save("data/TestCaptures/rightTower.png")
