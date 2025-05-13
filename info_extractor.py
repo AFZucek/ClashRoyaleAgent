@@ -17,8 +17,6 @@ def extract():
     image = Image.open(image_path)
 
     print(image.size)
-    #image = updateImageSize(image)
-    #print(image.size)
 
     # time left in seconds
     #time_remaining = get_time(image) # or set a timer
@@ -27,11 +25,21 @@ def extract():
     l, r = get_tower(image)
     print(f"Left Tower health: {l}")
     print(f"Right Tower health: {r}")
-    # Cards on screen, oponent/user
+
+
+    # Cards on screen, oponent/user (OCR)
+
 
     # User tower information
-    get_elixir()
+
+    # get elixir (optional)
+
+    #e = get_elixir()
+
     # Cards in hand w/their information
+
+    # return
+    return l, r
 
 def updateImageSize(img):
     width, height = img.size
@@ -42,9 +50,7 @@ def updateImageSize(img):
         img.save(path)
     return img   
     
-
-
-def ocr_int_from_subimage(sub_img):
+def ocr_int_from_subimage(sub_img, thres):
     # gray scale
     gray = sub_img.convert("L")
 
@@ -53,15 +59,18 @@ def ocr_int_from_subimage(sub_img):
     #big = gray.resize(new_size, Image.LANCZOS)
 
     # normalize based on threshold 150
-    bw = gray.point(lambda x: 0 if x < 180 else 255, mode="1")
+    bw = gray.point(lambda x: 0 if x < thres else 255, mode="1")
 
     # invert
     inv = ImageOps.invert(bw.convert("L")).convert("1")
-    inv.show()
+    # inv.show()
 
     # OCR with single-line PSM and digit whitelist
     # comment this out if its not on windows
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Users\mfouc\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
+    if os.getlogin() == 'mfouc':
+        pytesseract.pytesseract.tesseract_cmd = r"C:\Users\mfouc\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
+    else:
+        pytesseract.pytesseract.tesseract_cmd = r"D:\Program Files\tesseract.exe"
 
     config = "--psm 7 -c tessedit_char_whitelist=0123456789"
     raw = pytesseract.image_to_string(inv, config=config).strip()
@@ -99,9 +108,9 @@ def get_elixir():
     # Crop number region
     number_box = (x + offset_x, y + offset_y, x + offset_x + box_width, y + offset_y + box_height)
     sub_img = Image.open("data/TestCaptures/testscreen.png").crop(number_box)
-    sub_img.show()
+
     # run OCR
-    print(ocr_int_from_subimage(sub_img))
+    print(ocr_int_from_subimage(sub_img, 190))
 
 
 def get_tower(image):
@@ -112,7 +121,7 @@ def get_tower(image):
     w, h = image.size
     left   = int(w * 0.1983)
     top    = int(h * 0.1328)
-    width  = int(w * 0.0717)
+    width  = int(w * 0.0717 * 1.18)
     height = int(h * 0.01896)
 
     left_sub = image.crop((left, top, left + width, top + height))
@@ -124,7 +133,7 @@ def get_tower(image):
     w, h = image.size
     left   = int(w * 0.7253)
     top    = int(h * 0.1328)
-    width  = int(w * 0.0717)
+    width  = int(w * 0.0717 * 1.18)
     height = int(h * 0.01896)
     right_sub = image.crop((left, top, left + width, top + height))
 
@@ -132,9 +141,8 @@ def get_tower(image):
     right_sub.save("data/TestCaptures/rightTower.png")
 
     # run OCR
-    l_val = ocr_int_from_subimage(left_sub)
-    r_val = ocr_int_from_subimage(right_sub)
+    l_val = ocr_int_from_subimage(left_sub, 180)
+    r_val = ocr_int_from_subimage(right_sub, 180)
     return l_val, r_val
-
 
 extract()
