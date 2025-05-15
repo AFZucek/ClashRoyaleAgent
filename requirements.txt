@@ -4,3 +4,5 @@ opencv-python==4.5.5.64
 numpy==1.21.6
 PyGetWindow==0.0.9
 PyAutoGUI==0.9.54
+torch==2.7.0+cpu
+torchvision==0.22.0+cpu
