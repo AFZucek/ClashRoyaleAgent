@@ -144,5 +144,3 @@ def get_tower(image):
     l_val = ocr_int_from_subimage(left_sub, 180)
     r_val = ocr_int_from_subimage(right_sub, 180)
     return l_val, r_val
-
-extract()
