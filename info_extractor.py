@@ -55,7 +55,7 @@ def ocr_int_from_subimage(sub_img, thres):
     gray = sub_img.convert("L")
 
     # resize
-    #new_size = (gray.width * 4, gray.height * 4)
+    #new_size = (gray.width * 2, gray.height * 2)
     #big = gray.resize(new_size, Image.LANCZOS)
 
     # normalize based on threshold 150
@@ -133,7 +133,7 @@ def get_tower(image):
     w, h = image.size
     left   = int(w * 0.7253)
     top    = int(h * 0.1328)
-    width  = int(w * 0.0717 * 1.18)
+    width  = int(w * 0.0717 * 1.13)
     height = int(h * 0.01896)
     right_sub = image.crop((left, top, left + width, top + height))
 
