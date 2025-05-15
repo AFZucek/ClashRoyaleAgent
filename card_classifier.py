@@ -9,7 +9,7 @@ import zipfile
 
 
 # Parameters
-DATA_DIR = "C:\Users\mfouc\OneDrive\Desktop\Clash_Cards_Data" # replace with your path
+DATA_DIR = "C:/Users/mfouc/OneDrive/Desktop/Clash_Cards_Data/" # error here ??
 BATCH_SIZE = 32 # depends on cpu/gpu
 NUM_EPOCHS = 10 # passes over data
 IMG_SIZE = 128
