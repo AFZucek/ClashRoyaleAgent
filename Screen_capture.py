@@ -1,3 +1,6 @@
+# screen capture the image
+
+#### IMPORTS ####
 from PIL import ImageGrab
 # py -3.11 -m pip install pygetwindow
 import pygetwindow as gw
