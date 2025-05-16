@@ -26,9 +26,14 @@ def extract():
     print(f"Left Tower health: {l}")
     print(f"Right Tower health: {r}")
 
-
+    """
     # Cards on screen, oponent/user (OCR)
-
+    c1, c2, c3, c4 = get_cards(image)
+    print(f"Card 1: {c1}")
+    print(f"Card 2: {c2}")
+    print(f"Card 3: {c3}")
+    print(f"Card 4: {c4}")
+    """
 
     # User tower information
 
@@ -144,3 +149,22 @@ def get_tower(image):
     l_val = ocr_int_from_subimage(left_sub, 180)
     r_val = ocr_int_from_subimage(right_sub, 180)
     return l_val, r_val
+
+def get_cards(image):
+    """
+    crops image to each of the 4 cards, runs template matching
+    later update to work with more cards
+    Currently works with: knight, archers, minions, arrows, fireball, giant, mini pecka, muskateer
+    """
+
+    # card 1
+    w, h = image.size
+    left   = int(w * 0.1983)
+    top    = int(h * 0.1328)
+    width  = int(w * 0.0717 * 1.18)
+    height = int(h * 0.01896)
+
+    card1 = image.crop((left, top, left + width, top + height))
+
+    # you can now save or work with sub_img
+    card1.save("data/TestCaptures/card1.png")
