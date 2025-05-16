@@ -23,7 +23,7 @@ def gameOver(time):
     Function that returns if the game is over given the time
     Later update to factor in game ending by 3 crown, overtime, ect. 
     """
-    if (time - start_time) > 8: #should really be 180 for full game
+    if (time - start_time) > 30: #should really be 180 for full game
         return 1
 
 
@@ -55,12 +55,13 @@ def main():
     """
 
     start_training_battle()
-    time.sleep(5) # lets game load, update this later
+    time.sleep(7) # lets game load, update this later
 
     while not gameOver(time.perf_counter()):
+        print("time since ran: ", time.perf_counter() - start_time)
         capture_bluestacks(win)
         extract()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  
     main()

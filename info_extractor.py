@@ -7,6 +7,8 @@ import pytesseract
 import cv2
 import numpy as np
 
+cv2.ocl.setUseOpenCL(True) #trying this to use open cl with amd gpu
+
 def extract():
     """Puts together information extracted by OCR in the game"""
 
@@ -26,6 +28,7 @@ def extract():
     print(f"Left Tower health: {l}")
     print(f"Right Tower health: {r}")
 
+    get_cards(image)
     """
     # Cards on screen, oponent/user (OCR)
     c1, c2, c3, c4 = get_cards(image)
@@ -156,15 +159,65 @@ def get_cards(image):
     later update to work with more cards
     Currently works with: knight, archers, minions, arrows, fireball, giant, mini pecka, muskateer
     """
+    cards = ["data/TestCaptures/card1.png", "data/TestCaptures/card2.png", 
+             "data/TestCaptures/card3.png", "data/TestCaptures/card4.png"]
 
     # card 1
     w, h = image.size
-    left   = int(w * 0.1983)
-    top    = int(h * 0.1328)
-    width  = int(w * 0.0717 * 1.18)
-    height = int(h * 0.01896)
+    left   = int(w * 0.228)
+    top    = int(h * 0.8331)
+    width  = int(w * .16)
+    height = int(h * .095707)
 
     card1 = image.crop((left, top, left + width, top + height))
-
-    # you can now save or work with sub_img
     card1.save("data/TestCaptures/card1.png")
+
+    # card 2
+    left = int(w * 0.415)
+    card2 = image.crop((left, top, left + width, top + height))
+    card2.save("data/TestCaptures/card2.png")
+    print("left is", left)
+
+    # card 3
+    left = int(w * 0.61)
+    card3 = image.crop((left, top, left + width, top + height))
+    card3.save("data/TestCaptures/card3.png")
+    print("left is, ", left)
+
+    # card 4
+    left = int(w * 0.79)
+    card4 = image.crop((left, top, left + width, top + height))
+    card4.save("data/TestCaptures/card4.png")
+
+
+    matched_cards = []
+
+    for card in cards:
+
+        # Load images
+        card_img = Image.open(card).convert("L")
+        full_array = np.array(card_img)
+
+        max_match = -1
+        matched_card = ""
+
+        # iterates through templates in /Templates, later update to subfolder
+        for filename in os.listdir("data/Templates"):
+            template = Image.open("data/Templates/" + filename).convert("L")
+            tempate_array = np.array(template)
+
+            #Match template
+            result = cv2.matchTemplate(full_array, tempate_array, cv2.TM_CCORR_NORMED)
+            _, max_val, _, max_loc = cv2.minMaxLoc(result)
+
+            if max_val > max_match:
+                max_match = max_val
+                matched_card = filename
+
+            #print(f"Match confidence is: {max_val:.3f} for template {filename} and image {card}")
+
+        matched_cards.append(matched_card)
+
+        #print(f"\ncard was identified as: {matched_card}\n")
+        
+    print(f"\n{matched_cards}\n")
