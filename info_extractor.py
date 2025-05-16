@@ -18,10 +18,8 @@ def extract():
     image_path = os.path.join(dir, "testscreen.png")
     image = Image.open(image_path)
 
-    print(image.size)
+    #print(image.size)
 
-    # time left in seconds
-    #time_remaining = get_time(image) # or set a timer
     
     # Enemy tower information
     l, r = get_tower(image)
@@ -66,12 +64,12 @@ def ocr_int_from_subimage(sub_img, thres):
     #new_size = (gray.width * 4, gray.height * 4)
     #big = gray.resize(new_size, Image.LANCZOS)
 
-    # normalize based on threshold 150
+    # normalize based on threshold 
     bw = gray.point(lambda x: 0 if x < thres else 255, mode="1")
 
     # invert
     inv = ImageOps.invert(bw.convert("L")).convert("1")
-    # inv.show()
+    #inv.show()
 
     # OCR with single-line PSM and digit whitelist
     # comment this out if its not on windows
@@ -80,7 +78,9 @@ def ocr_int_from_subimage(sub_img, thres):
     else:
         pytesseract.pytesseract.tesseract_cmd = r"D:\Program Files\tesseract.exe"
 
-    config = "--psm 7 -c tessedit_char_whitelist=0123456789"
+    #config = "--psm 7 -c tessedit_char_whitelist=0123456789"
+    config = "--psm 13 -c tessedit_char_whitelist=0123456789"
+
     raw = pytesseract.image_to_string(inv, config=config).strip()
 
     # Return integer or None
@@ -129,7 +129,7 @@ def get_tower(image):
     w, h = image.size
     left   = int(w * 0.1983)
     top    = int(h * 0.1328)
-    width  = int(w * 0.0717 * 1.18)
+    width  = int(w * 0.0715 * 1)
     height = int(h * 0.01896)
 
     left_sub = image.crop((left, top, left + width, top + height))
@@ -139,9 +139,9 @@ def get_tower(image):
 
     # right
     w, h = image.size
-    left   = int(w * 0.7253)
+    left   = int(w * 0.723)
     top    = int(h * 0.1328)
-    width  = int(w * 0.0717 * 1.18)
+    width  = int(w * 0.0715 * 1)
     height = int(h * 0.01896)
     right_sub = image.crop((left, top, left + width, top + height))
 
@@ -166,8 +166,8 @@ def get_cards(image):
     w, h = image.size
     left   = int(w * 0.228)
     top    = int(h * 0.8331)
-    width  = int(w * .16)
-    height = int(h * .095707)
+    width  = int(w * .17)
+    height = int(h * .0958)
 
     card1 = image.crop((left, top, left + width, top + height))
     card1.save("data/TestCaptures/card1.png")
@@ -176,13 +176,13 @@ def get_cards(image):
     left = int(w * 0.415)
     card2 = image.crop((left, top, left + width, top + height))
     card2.save("data/TestCaptures/card2.png")
-    print("left is", left)
+    #print("left is", left)
 
     # card 3
-    left = int(w * 0.61)
+    left = int(w * 0.6)
     card3 = image.crop((left, top, left + width, top + height))
     card3.save("data/TestCaptures/card3.png")
-    print("left is, ", left)
+    #print("left is, ", left)
 
     # card 4
     left = int(w * 0.79)

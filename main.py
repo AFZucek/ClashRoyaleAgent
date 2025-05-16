@@ -23,7 +23,7 @@ def gameOver(time):
     Function that returns if the game is over given the time
     Later update to factor in game ending by 3 crown, overtime, ect. 
     """
-    if (time - start_time) > 30: #should really be 180 for full game
+    if (time - start_time) > 12: #should really be 180 for full game
         return 1
 
 
@@ -38,7 +38,7 @@ def start_training_battle():
     win.activate()
     time.sleep(0.03)  # give it a moment to come to front
 
-    pyautogui.moveTo(2400, 250)  # move mouse to click menu
+    pyautogui.moveTo(2400, 240)  # move mouse to click menu
     pyautogui.click()           # default is left-click
 
     pyautogui.moveTo(2000, 780)  # move mouse to click training
@@ -55,10 +55,10 @@ def main():
     """
 
     start_training_battle()
-    time.sleep(7) # lets game load, update this later
+    time.sleep(6.5) # lets game load, update this later
 
     while not gameOver(time.perf_counter()):
-        print("time since ran: ", time.perf_counter() - start_time)
+        print("time since ran: ", float(time.perf_counter() - start_time))
         capture_bluestacks(win)
         extract()
 
