@@ -40,12 +40,13 @@ def extract():
 
     # get elixir (optional)
 
-    #e = get_elixir()
+    e = get_elixir(image)
+    print(f"Elixir: {e}")
 
     # Cards in hand w/their information
 
     # return
-    return l, r
+    return l, r, e
 
 def updateImageSize(img):
     width, height = img.size
@@ -61,7 +62,7 @@ def ocr_int_from_subimage(sub_img, thres):
     gray = sub_img.convert("L")
 
     # resize
-    #new_size = (gray.width * 4, gray.height * 4)
+    #new_size = (gray.width // 2, gray.height // 2)
     #big = gray.resize(new_size, Image.LANCZOS)
 
     # normalize based on threshold 
@@ -89,36 +90,31 @@ def ocr_int_from_subimage(sub_img, thres):
     except ValueError:
         return None
 
-def get_elixir():
-    """get a cropped image of the elixir with open CV template matching"""
-
-    # Load images
-    full_img = Image.open("data/TestCaptures/testscreen.png").convert("L")
-    template = Image.open("data/template.png").convert("L")
-
-    full_array = np.array(full_img)
-    tempate_array = np.array(template)
-
-    # Match template
-    result = cv2.matchTemplate(full_array, tempate_array, cv2.TM_CCOEFF_NORMED)
-    _, max_val, _, max_loc = cv2.minMaxLoc(result)
-
-    print(f"Match confidence: {max_val:.3f} at {max_loc}")
-
-    x, y = max_loc
-
-    # Offset to where number is expected
-    offset_x = 90
-    offset_y = 0
-    box_width = 80
-    box_height = 75
-
-    # Crop number region
-    number_box = (x + offset_x, y + offset_y, x + offset_x + box_width, y + offset_y + box_height)
-    sub_img = Image.open("data/TestCaptures/testscreen.png").crop(number_box)
-
-    # run OCR
-    print(ocr_int_from_subimage(sub_img, 190))
+def get_elixir(image):
+    """check pixel color values which is the fastest way to get count of elixer"""
+    bar_y = int(image.height * 0.9796)
+    elixir_ratios = [
+        0.3291,  # 1 elixir
+        0.4051,  # 2
+        0.4722,  # 3
+        0.5424,  # 4
+        0.6127,  # 5
+        0.6797,  # 6
+        0.7511,  # 7
+        0.8228,  # 8
+        0.8861,  # 9
+        0.9536   # 10 elixir
+    ]
+    count = 0
+    # loop through checking values
+    for segment in elixir_ratios:
+        pixel = image.getpixel((int(image.width * segment), bar_y))
+        if (pixel[0] > 150):
+            count += 1
+        else: 
+            break
+    return count
+    
 
 
 def get_tower(image):
@@ -139,18 +135,21 @@ def get_tower(image):
 
     # right
     w, h = image.size
-    left   = int(w * 0.723)
+    left   = int(w * 0.7225)
     top    = int(h * 0.1328)
-    width  = int(w * 0.0715 * 1)
+    width  = int(w * 0.0715 * 1.08)
     height = int(h * 0.01896)
     right_sub = image.crop((left, top, left + width, top + height))
-
+ 
     # you can now save or work with sub_img
     right_sub.save("data/TestCaptures/rightTower.png")
 
     # run OCR
-    l_val = ocr_int_from_subimage(left_sub, 180)
-    r_val = ocr_int_from_subimage(right_sub, 180)
+    l_val = ocr_int_from_subimage(left_sub, 178)
+    r_val = ocr_int_from_subimage(right_sub, 178)
+
+
+
     return l_val, r_val
 
 def get_cards(image):
