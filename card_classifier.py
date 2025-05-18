@@ -20,14 +20,10 @@ IMG_SIZE = 128
 MODEL_PATH = "Models/classifier.pth"
 """
 
-
-PATH = "C:/Users/mfouc/OneDrive/Desktop/GameData/Arena_1"
-
-# error check for addy
-if os.getlogin() != "mfouc":
-    print("Set up a folder to store ALL data")
-    exit
-
+if os.getlogin() == 'mfouc':
+    PATH = "C:/Users/mfouc/OneDrive/Desktop/GameData/Arena_1"
+else:
+    PATH = "D:/ClashData/TestScreenshots/Arena_1/1" #update num for each game
 
 def collect_images(interval):
     """ watches clash royale games and takes images storing for data"""
@@ -52,7 +48,7 @@ def collect_images(interval):
 
 
 
-    for i in range(60):
+    for i in range(90):
         x, y, w, h = win.left, win.top, win.width, win.height
 
         img = pyautogui.screenshot(region=(x, y, w, h))
@@ -69,4 +65,4 @@ def collect_images(interval):
         time.sleep(interval)
 
 
-collect_images(3)
+collect_images(2)
