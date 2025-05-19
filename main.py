@@ -5,9 +5,7 @@ from info_extractor import extract
 import time
 from Screen_capture import pyautogui
 import pygetwindow as gw
-# load in the .env file
-from dotenv import load_dotenv
-load_dotenv()
+
 
 #initialize window to bring bluestacks to the front later
 window = gw.getWindowsWithTitle("BlueStacks")
