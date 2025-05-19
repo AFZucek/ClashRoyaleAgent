@@ -65,6 +65,9 @@ def collect_images(interval):
 
 
 def check_cuda():
+    """checks if you have GPU to use"""
+
+    
     if not torch.cuda.is_available():
         print("[ERROR] CUDA is not available. Training will fall back to CPU.")
         sys.exit(1)
@@ -104,7 +107,7 @@ def run_inference(model_path):
 
     results = model(
         # add config for both of us
-        "C:/Users/mfouc/OneDrive/Desktop/GameData/testData/image_1747621634.png",
+        "C:/Users/mfouc/OneDrive/Desktop/GameData/testData/image_1747621486.png",
         conf=0.2,
         iou=0.6,
         save=True,
