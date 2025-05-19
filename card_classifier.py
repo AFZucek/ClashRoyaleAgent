@@ -1,12 +1,7 @@
 ###imports###
 import os
-"""
 import torch
-import torch.nn as nn
-import torch.optim as optim
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
-"""
+import sys
 from Screen_capture import pyautogui
 import pygetwindow as gw
 import time
@@ -69,23 +64,62 @@ def collect_images(interval):
         time.sleep(interval)
 
 
-def train():
+def check_cuda():
+    if not torch.cuda.is_available():
+        print("[ERROR] CUDA is not available. Training will fall back to CPU.")
+        sys.exit(1)
+    else:
+        print(f"[INFO] CUDA is available. Using GPU: {torch.cuda.get_device_name(0)}")
 
-    # Load a pretrained YOLO model (recommended for training)
+def train_model_if_needed():
+    """checks if model exists, if not trains a new one and stores in the git folder"""
+
+    # should work for both of us
+    model_path = "Models/training/weights/best.pt"
+
+    if os.path.exists(model_path):
+        print(f"[INFO] Model already trained. Using existing model at: {model_path}")
+        return model_path
+
+    print("[INFO] Model not found. Starting training on GPU...")
     model = YOLO("yolo11n.pt")
+    model.train(
+        # add config for both of us here
+        data="C:/Users/mfouc/OneDrive/Desktop/Clash Royal Detection V2.v1i.yolov8/data.yaml",
+        epochs=100,
+        conf=0.2,
+        project="Models",   # Store everything inside the Models folder
+        name="training",
+        device="cuda"
+    )
+    print("[INFO] Training complete.")
+    return model_path
 
-    # Train the model using the 'coco8.yaml' dataset for 3 epochs
-    results = model.train(data="D:/ClashData/CNNYOLO8Data/data.yaml", epochs=3)
+def run_inference(model_path):
+    """ this is where the prediction happens and the inference based on the model trained above"""
 
-    # Evaluate the model's performance on the validation set
-    results = model.val()
 
-    # Perform object detection on an image using the model
-    results = model("D:/ClashData/CNN_Test_Images/image_1747453019.png", save = True)
+    print("[INFO] Running inference on GPU...")
+    model = YOLO(model_path)
 
-    # Export the model to ONNX format
-    success = model.export(format="onnx")
+    results = model(
+        # add config for both of us
+        "C:/Users/mfouc/OneDrive/Desktop/GameData/testData/image_1747621634.png",
+        conf=0.2,
+        iou=0.6,
+        save=True,
+        project="Models/Results",   # Save inference results in Models/Results
+        name="inference_run1",
+        device="cuda"
+    )
+    print("[INFO] Inference complete. Results saved.")
 
-#collect_images(2)
+def use_Pre_Trained():
+    check_cuda()
+    model_path = train_model_if_needed()
+    run_inference(model_path)
 
-train()
+
+if __name__ == "__main__":
+    #collect_images(2)
+    use_Pre_Trained()

@@ -4,5 +4,8 @@ opencv-python==4.5.5.64
 numpy==1.21.6
 PyGetWindow==0.0.9
 PyAutoGUI==0.9.54
-torch==2.7.0+cpu
-torchvision==0.22.0+cpu
+ultralytics>=8.0.0
+torch==2.7.0+cu118
+torchvision==0.18.0+cu118
+torchaudio==2.7.0+cu118
+--extra-index-url https://download.pytorch.org/whl/cu118
