@@ -7,6 +7,9 @@ import pygetwindow as gw
 import pyautogui
 import time
 import os
+# load in the .env file
+from dotenv import load_dotenv
+load_dotenv()
 
 #moved path creation outside of function
 path = os.path.join("data", "TestCaptures", "testscreen.png")

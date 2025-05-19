@@ -6,9 +6,12 @@ from Screen_capture import pyautogui
 import pygetwindow as gw
 import time
 
-
 #grab pre made model
 from ultralytics import YOLO
+
+# load in the .env file
+from dotenv import load_dotenv
+load_dotenv()
 
 """
 # Parameters
@@ -67,7 +70,7 @@ def collect_images(interval):
 def check_cuda():
     """checks if you have GPU to use"""
 
-    
+
     if not torch.cuda.is_available():
         print("[ERROR] CUDA is not available. Training will fall back to CPU.")
         sys.exit(1)

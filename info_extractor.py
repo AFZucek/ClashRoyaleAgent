@@ -6,6 +6,9 @@ from PIL import Image, ImageOps
 import pytesseract
 import cv2
 import numpy as np
+# load in the .env file
+from dotenv import load_dotenv
+load_dotenv()
 
 cv2.ocl.setUseOpenCL(True) #trying this to use open cl with amd gpu
 
