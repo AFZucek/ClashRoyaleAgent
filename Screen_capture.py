@@ -8,6 +8,7 @@ import pyautogui
 import time
 import os
 
+
 #moved path creation outside of function
 path = os.path.join("data", "TestCaptures", "testscreen.png")
 os.makedirs(os.path.dirname(path), exist_ok=True)

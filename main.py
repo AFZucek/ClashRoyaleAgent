@@ -6,6 +6,7 @@ import time
 from Screen_capture import pyautogui
 import pygetwindow as gw
 
+
 #initialize window to bring bluestacks to the front later
 window = gw.getWindowsWithTitle("BlueStacks")
 

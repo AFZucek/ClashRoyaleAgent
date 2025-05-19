@@ -6,23 +6,20 @@ from Screen_capture import pyautogui
 import pygetwindow as gw
 import time
 
-
 #grab pre made model
 from ultralytics import YOLO
 
-"""
-# Parameters
-DATA_DIR = "C:/Users/mfouc/OneDrive/Desktop/Clash_Cards_Data/" # error here ??
-BATCH_SIZE = 32 # depends on cpu/gpu
-NUM_EPOCHS = 10 # passes over data
-IMG_SIZE = 128
-MODEL_PATH = "Models/classifier.pth"
-"""
+# load in the .env file
+from dotenv import load_dotenv
+load_dotenv()
 
-if os.getlogin() == 'mfouc':
-    PATH = "C:/Users/mfouc/OneDrive/Desktop/GameData/Arena_1"
-else:
-    PATH = "D:/ClashData/TestScreenshots/Arena_1/1" #update num for each game
+
+# Parameters from the .env file
+DATA_STORAGE_PATH = os.getenv("DATA_STORAGE_PATH")
+YOLO_DATA_PATH = os.getenv("YOLO_DATA_PATH")
+INFERENCE_IMAGE = os.getenv("INFERENCE_IMAGE")
+
+
 
 def collect_images(interval):
     """ watches clash royale games and takes images storing for data"""
@@ -60,14 +57,14 @@ def collect_images(interval):
 
         # save image
         filename = f"image_{int(time.time())}.png"
-        cropped.save(f"{PATH}/{filename}")
+        cropped.save(f"{DATA_STORAGE_PATH}/{filename}")
         time.sleep(interval)
 
 
 def check_cuda():
     """checks if you have GPU to use"""
 
-    
+
     if not torch.cuda.is_available():
         print("[ERROR] CUDA is not available. Training will fall back to CPU.")
         sys.exit(1)
@@ -87,8 +84,8 @@ def train_model_if_needed():
     print("[INFO] Model not found. Starting training on GPU...")
     model = YOLO("yolo11n.pt")
     model.train(
-        # add config for both of us here
-        data="C:/Users/mfouc/OneDrive/Desktop/Clash Royal Detection V2.v1i.yolov8/data.yaml",
+        # add config to .env
+        data=YOLO_DATA_PATH,
         epochs=100,
         conf=0.2,
         project="Models",   # Store everything inside the Models folder
@@ -106,8 +103,8 @@ def run_inference(model_path):
     model = YOLO(model_path)
 
     results = model(
-        # add config for both of us
-        "C:/Users/mfouc/OneDrive/Desktop/GameData/testData/image_1747621486.png",
+        # add this config to .env
+        INFERENCE_IMAGE,
         conf=0.2,
         iou=0.6,
         save=True,

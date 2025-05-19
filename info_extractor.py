@@ -6,6 +6,14 @@ from PIL import Image, ImageOps
 import pytesseract
 import cv2
 import numpy as np
+# load in the .env file
+from dotenv import load_dotenv
+load_dotenv()
+
+# set up the pytesseract EXE 
+TESSERACT_EXE_PATH = os.getenv("TESSERACT_EXE_PATH")
+
+
 
 cv2.ocl.setUseOpenCL(True) #trying this to use open cl with amd gpu
 
@@ -73,11 +81,7 @@ def ocr_int_from_subimage(sub_img, thres):
     #inv.show()
 
     # OCR with single-line PSM and digit whitelist
-    # comment this out if its not on windows
-    if os.getlogin() == 'mfouc':
-        pytesseract.pytesseract.tesseract_cmd = r"C:\Users\mfouc\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
-    else:
-        pytesseract.pytesseract.tesseract_cmd = r"D:\Program Files\tesseract.exe"
+    pytesseract.pytesseract.tesseract_cmd = TESSERACT_EXE_PATH
 
     #config = "--psm 7 -c tessedit_char_whitelist=0123456789"
     config = "--psm 13 -c tessedit_char_whitelist=0123456789"
